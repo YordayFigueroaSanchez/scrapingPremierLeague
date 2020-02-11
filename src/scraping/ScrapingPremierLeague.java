@@ -26,7 +26,7 @@ public class ScrapingPremierLeague {
 	public static void main(String[] args) throws ParserConfigurationException, TransformerConfigurationException {
 		// TODO Auto-generated method stub
 
-		String url = "https://www.baseball-reference.com/boxes/HOU/HOU201910300.shtml";
+		String url = "https://www.premierleague.com/match/46818";
 
 		String file = "jornada21.html";
 		int contador = 0;
@@ -58,7 +58,7 @@ public class ScrapingPremierLeague {
 //			Document documento = getHtmlFileToDocument(file);
 
 			//consultando por <div class="scorebox">
-			Elements scoreboxElements = documento.select("div.scorebox");
+			Elements scoreboxElements = documento.select("div.event");
 			gameElement.attr("nro_scorebox", String.valueOf(scoreboxElements.size()));
 //			Analizando el score del juego
 			//Elements matchesContainer = documento.select("div.matches-container__match");
