@@ -58,8 +58,10 @@ public class ScrapingPremierLeague {
 //			Document documento = getHtmlFileToDocument(file);
 
 			//consultando por <div class="scorebox">
-			Elements scoreboxElements = documento.select("div.event");
-			gameElement.attr("nro_scorebox", String.valueOf(scoreboxElements.size()));
+			Elements scoreboxElementsTeamHome = documento.select("div.team.home>a.teamName>span.long");
+			gameElement.attr("teamhome", String.valueOf(scoreboxElementsTeamHome.size()));
+			Elements scoreboxElementsTeamAway = documento.select("div.team.away");
+			gameElement.attr("teamaway", String.valueOf(scoreboxElementsTeamAway.size()));
 //			Analizando el score del juego
 			//Elements matchesContainer = documento.select("div.matches-container__match");
 			//Elements matchesContainer = documento.select("div.match.ng-star-inserted");
