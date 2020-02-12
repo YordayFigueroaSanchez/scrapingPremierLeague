@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +28,9 @@ public class ScrapingPremierLeague {
 		// TODO Auto-generated method stub
 
 		String url = "https://www.premierleague.com/match/46818";
+		ArrayList<String> arregloUrl = new ArrayList<String>();
+		arregloUrl.add("https://www.premierleague.com/match/46779");
+		arregloUrl.add("https://www.premierleague.com/match/46778");
 
 		String file = "jornada21.html";
 		int contador = 0;
@@ -47,21 +51,41 @@ public class ScrapingPremierLeague {
 		
 		// elemento raiz
 //		Document doc = docBuilder.newDocument();
-		Element gameElement = doc.createElement("game");
-		doc.appendChild(gameElement);
-		gameElement.attr("nro", posJornada);
+		Element jornadaElement = doc.createElement("jornada");
+		doc.appendChild(jornadaElement);
+		jornadaElement.attr("nro", posJornada);
 
-		if (getStatusConnectionCode(url) == 200) {
+		for (String stringUrl : arregloUrl) {
+			
+		
+		
+		if (getStatusConnectionCode(stringUrl) == 200) {
 //		if (getStatusFile(file) == 1) {
 
-			Document documento = getHtmlDocument(url);
+			Document documento = getHtmlDocument(stringUrl);
 //			Document documento = getHtmlFileToDocument(file);
 
+			Element gameElement = doc.createElement("game");
+			
 			//consultando por <div class="scorebox">
 			Elements scoreboxElementsTeamHome = documento.select("div.team.home>a.teamName>span.long");
-			gameElement.attr("teamhome", String.valueOf(scoreboxElementsTeamHome.size()));
-			Elements scoreboxElementsTeamAway = documento.select("div.team.away");
-			gameElement.attr("teamaway", String.valueOf(scoreboxElementsTeamAway.size()));
+			gameElement.attr("teamhome", String.valueOf(scoreboxElementsTeamHome.get(0).html()));
+			Elements scoreboxElementsTeamAway = documento.select("div.team.away>a.teamName>span.long");
+			gameElement.attr("teamaway", String.valueOf(scoreboxElementsTeamAway.get(0).html()));
+			
+			Elements scoreboxElementsTeamHomeShort = documento.select("div.team.home>a.teamName>span.short");
+			gameElement.attr("teamhomeshort", String.valueOf(scoreboxElementsTeamHomeShort.get(0).html()));
+			Elements scoreboxElementsTeamAwayShort = documento.select("div.team.away>a.teamName>span.short");
+			gameElement.attr("teamawayshort", String.valueOf(scoreboxElementsTeamAwayShort.get(0).html()));
+			
+			//marcador
+			Elements scoreboxElementsMarcador = documento.select("div.matchScoreContainer>div.centre>div.score.fullTime");
+			String[] arreglo = scoreboxElementsMarcador.get(0).html().split("<span>-</span>");
+			gameElement.attr("teamhomeGoal", String.valueOf(arreglo[0]));
+			gameElement.attr("teamawayGoal", String.valueOf(arreglo[1]));
+			
+			jornadaElement.appendChild(gameElement);
+			
 //			Analizando el score del juego
 			//Elements matchesContainer = documento.select("div.matches-container__match");
 			//Elements matchesContainer = documento.select("div.match.ng-star-inserted");
@@ -71,6 +95,7 @@ public class ScrapingPremierLeague {
 //			for (Element element : matchesContainer) {
 //				jornadaElement.appendChild(extractGame2(element, doc));
 //			}
+		}
 		}
 
 		// nombre del fichero
@@ -88,7 +113,7 @@ public class ScrapingPremierLeague {
 			 writer = new BufferedWriter
 				    (new OutputStreamWriter(new FileOutputStream(ruta + nombreFichero + ".xml"), StandardCharsets.UTF_8));
 			//System.out.println(jornadaElement.outerHtml());
-			writer.write(gameElement.outerHtml());
+			writer.write(jornadaElement.outerHtml());
 
 		} catch (IOException e) {
 			System.out.println("error");
