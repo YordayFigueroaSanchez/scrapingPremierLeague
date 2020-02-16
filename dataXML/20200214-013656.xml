@@ -1,0 +1,18 @@
+<games nro="21">
+ <game matchweek="18" att="54415">
+  <team name_long="Manchester City" name_short="MCI" goal="3">
+   <anota_list>
+    <anota name="Riyad Mahrez"></anota>
+    <anota name="Ilkay Gündogan"></anota>
+    <anota name="Gabriel Jesus"></anota>
+   </anota_list>
+  </team>
+  <team name_long="Leicester City" name_short="LEI" goal="1"></team>
+ </game>
+ <game matchweek="18" att="39336">
+  <team name_long="Everton" name_short="EVE" goal="0">
+   <anota_list></anota_list>
+  </team>
+  <team name_long="Arsenal" name_short="ARS" goal="0"></team>
+ </game>
+</games>

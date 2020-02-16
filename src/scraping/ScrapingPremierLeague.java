@@ -51,9 +51,9 @@ public class ScrapingPremierLeague {
 		
 		// elemento raiz
 //		Document doc = docBuilder.newDocument();
-		Element jornadaElement = doc.createElement("jornada");
-		doc.appendChild(jornadaElement);
-		jornadaElement.attr("nro", posJornada);
+		Element gameList = doc.createElement("games");
+		doc.appendChild(gameList);
+		gameList.attr("nro", posJornada);
 
 		for (String stringUrl : arregloUrl) {
 			
@@ -66,25 +66,51 @@ public class ScrapingPremierLeague {
 //			Document documento = getHtmlFileToDocument(file);
 
 			Element gameElement = doc.createElement("game");
+			Element teamElementHome = doc.createElement("team");
+			Element teamElementAway = doc.createElement("team");
 			
 			//consultando por <div class="scorebox">
 			Elements scoreboxElementsTeamHome = documento.select("div.team.home>a.teamName>span.long");
-			gameElement.attr("teamhome", String.valueOf(scoreboxElementsTeamHome.get(0).html()));
+			teamElementHome.attr("name_long", String.valueOf(scoreboxElementsTeamHome.get(0).html()));
 			Elements scoreboxElementsTeamAway = documento.select("div.team.away>a.teamName>span.long");
-			gameElement.attr("teamaway", String.valueOf(scoreboxElementsTeamAway.get(0).html()));
+			teamElementAway.attr("name_long", String.valueOf(scoreboxElementsTeamAway.get(0).html()));
 			
 			Elements scoreboxElementsTeamHomeShort = documento.select("div.team.home>a.teamName>span.short");
-			gameElement.attr("teamhomeshort", String.valueOf(scoreboxElementsTeamHomeShort.get(0).html()));
+			teamElementHome.attr("name_short", String.valueOf(scoreboxElementsTeamHomeShort.get(0).html()));
 			Elements scoreboxElementsTeamAwayShort = documento.select("div.team.away>a.teamName>span.short");
-			gameElement.attr("teamawayshort", String.valueOf(scoreboxElementsTeamAwayShort.get(0).html()));
+			teamElementAway.attr("name_short", String.valueOf(scoreboxElementsTeamAwayShort.get(0).html()));
+			//goles home
+			Element anotaElementList = doc.createElement("anota_list");
+			Elements goleadoresElementsHome = documento.select("div.matchEvents.matchEventsContainer>div.home>div.event");
+			for (Element goleadorHome : goleadoresElementsHome) {
+				Elements goleadorNameMinute = goleadorHome.select("a");
+				Element anotaElement = doc.createElement("anota").attr("name", goleadorNameMinute.get(0).html());
+				anotaElementList.appendChild(anotaElement);
+			}
+			teamElementHome.appendChild(anotaElementList);
 			
+			 
 			//marcador
 			Elements scoreboxElementsMarcador = documento.select("div.matchScoreContainer>div.centre>div.score.fullTime");
 			String[] arreglo = scoreboxElementsMarcador.get(0).html().split("<span>-</span>");
-			gameElement.attr("teamhomeGoal", String.valueOf(arreglo[0]));
-			gameElement.attr("teamawayGoal", String.valueOf(arreglo[1]));
+			teamElementHome.attr("goal", String.valueOf(arreglo[0].trim()));
+			teamElementAway.attr("goal", String.valueOf(arreglo[1].trim()));
 			
-			jornadaElement.appendChild(gameElement);
+			//jornada 
+			Elements jornadaElements = documento.select("div.dropDown>div.current>div.short");
+			String[] jornadaSplit = jornadaElements.get(0).html().split(" ");
+			gameElement.attr("matchweek", String.valueOf(jornadaSplit[1].trim()));
+			
+			//att 
+			Elements attElements = documento.select("div.attendance.show-m");
+			String[] attSplit = attElements.get(0).html().split("Att:");
+			gameElement.attr("att", String.valueOf(attSplit[1].trim().replaceAll(",", "")));
+			
+			//Agregando los teams
+			gameElement.appendChild(teamElementHome);
+			gameElement.appendChild(teamElementAway);
+			//Agregando game
+			gameList.appendChild(gameElement);
 			
 //			Analizando el score del juego
 			//Elements matchesContainer = documento.select("div.matches-container__match");
@@ -113,7 +139,7 @@ public class ScrapingPremierLeague {
 			 writer = new BufferedWriter
 				    (new OutputStreamWriter(new FileOutputStream(ruta + nombreFichero + ".xml"), StandardCharsets.UTF_8));
 			//System.out.println(jornadaElement.outerHtml());
-			writer.write(jornadaElement.outerHtml());
+			writer.write(gameList.outerHtml());
 
 		} catch (IOException e) {
 			System.out.println("error");
